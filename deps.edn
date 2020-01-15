@@ -1,0 +1,5 @@
+{:deps {integrant {:local/root "../integrant"}
+        re-frame {:mvn/version "0.10.6"}
+        metosin/reitit {:mvn/version "0.3.10"}
+        tape/module {:local/root "../module"}
+        tape/mvc {:local/root "../mvc"}}}
