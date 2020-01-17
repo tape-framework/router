@@ -1,6 +1,7 @@
 (ns tape.router-test
   (:require [clojure.set :as set]
-            [cljs.test :refer [deftest testing is are async use-fixtures]]
+            [cljs.test :refer [deftest testing is are async use-fixtures run-tests]]
+            [day8.re-frame.test :as rft]
             [integrant.core :as ig]
             [re-frame.core :as rf]
             [tape.module :as module :include-macros true]
@@ -48,18 +49,8 @@
   (is (= "#/foo" (router/href [::foo])))
   (is (= "#/bar/42" (router/href [::bar {:id 42}]))))
 
-;; Using this because window hashchange event approach was hanging
-(defn wait
-  ([timeout pred f] (wait timeout pred f 0))
-  ([timeout pred f total]
-   (if (< timeout total)
-     (f)
-     (if (pred)
-       (f)
-       (js/setTimeout #(wait timeout pred f (+ total 10)) 10)))))
-
 (deftest navigate-test
-  (async done
-    (let [pred #(= "#/baz" (.. js/window -location -hash))]
-      (wait 100 pred #(do (is (pred)) (done))))
-    (router/navigate [::baz])))
+  (rft/run-test-async
+   (router/navigate [::baz])
+   (rft/wait-for [::baz]
+     (is (= "#/baz" (.. js/window -location -hash))))))
