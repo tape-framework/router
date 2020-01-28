@@ -44,7 +44,7 @@ keyword is also the name of the route.
 
 ##### Navigate
 
-```cljs
+```clojure
 (ns sample.app.my-ns
   (:require [tape.router :as router]
             [sample.app.greet.controller :as greet.c]))
