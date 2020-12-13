@@ -1,4 +1,4 @@
 {:deps    {metosin/reitit {}
            tape/mvc       {:local/root "../mvc"}}
  :aliases {:test {:extra-paths ["test" "target"]
-                  :extra-deps  {day8.re-frame/test {}}}}}
+                  :extra-deps  {tape/dev {:local/root "../dev"}}}}}

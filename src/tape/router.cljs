@@ -10,16 +10,18 @@
 
 ;;; Interface
 
-(defn href
-  "Given the vector `to` made of a named path (qualified symbol) and a params
-  map, returns a path string of that route with slots filled from params."
+(defn href*
+  "Given the vector `to` made of a named path qualified-keyword and a params
+  map, returns a path string of that route with slots filled from params.
+  Example: `(router/href* [::counter.c/increment])`."
   [to]
   (reg-fn/subscribe [::href to]))
 
-(defn navigate
-  "Given the vector `to` made of a named path (qualified symbol) and a params
+(defn navigate*
+  "Given the vector `to` made of a named path qualified-keyword and a params
   map, dispatches an event that navigates the browser to the path string of
-  that route with slots filled from params."
+  that route with slots filled from params. Example:
+  `(router/navigate* [::counter.c/show])`."
   [to]
   (rf/dispatch [::navigate to]))
 

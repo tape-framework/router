@@ -1,13 +1,12 @@
 (ns tape.router-test
   (:require [clojure.set :as set]
-            [cljs.test :refer [deftest testing is are async use-fixtures run-tests]]
+            [cljs.test :refer [deftest testing is are async use-fixtures]]
             [day8.re-frame.test :as rft]
             [integrant.core :as ig]
-            [re-frame.core :as rf]
             [tape.module :as module :include-macros true]
             [tape.mvc.controller :as c :include-macros true]
             [tape.mvc.view :as v]
-            [tape.router :as router]))
+            [tape.router :as router :include-macros true]))
 
 (module/load-hierarchy)
 
@@ -45,12 +44,22 @@
                      ::router/navigate-event-fx}
                    (set (keys system)))))
 
+(deftest href*-test
+  (is (= "#/foo" (router/href* [::foo])))
+  (is (= "#/bar/42" (router/href* [::bar {:id 42}]))))
+
+(deftest navigate*-test
+  (rft/run-test-async
+   (router/navigate* [::baz])
+   (rft/wait-for [::baz]
+     (is (= "#/baz" (.. js/window -location -hash))))))
+
 (deftest href-test
-  (is (= "#/foo" (router/href [::foo])))
-  (is (= "#/bar/42" (router/href [::bar {:id 42}]))))
+  (is (= "#/foo" (router/href [foo])))
+  (is (= "#/bar/42" (router/href [bar {:id 42}]))))
 
 (deftest navigate-test
   (rft/run-test-async
-   (router/navigate [::baz])
+   (router/navigate [baz])
    (rft/wait-for [::baz]
      (is (= "#/baz" (.. js/window -location -hash))))))
