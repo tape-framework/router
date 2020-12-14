@@ -1,5 +1,5 @@
 {:tape.router/routes [:tape/const]
 
- :tape.router/href-fn [:tape.mvc.controller/reg-fn]
+ :tape.router/href* [:tape.mvc.controller/reg-fn]
  :tape.router/navigate-fx [:tape.mvc.controller/fx]
  :tape.router/navigate-event-fx [:tape.mvc.controller/event-fx]}

@@ -39,7 +39,7 @@
 
 (deftest module-test
   (is (set/subset? #{:tape/router
-                     ::router/href-fn
+                     ::router/href*
                      ::router/navigate-fx
                      ::router/navigate-event-fx}
                    (set (keys system)))))

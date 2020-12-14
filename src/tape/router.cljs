@@ -15,7 +15,7 @@
   map, returns a path string of that route with slots filled from params.
   Example: `(router/href* [::counter.c/increment])`."
   [to]
-  (reg-fn/subscribe [::href to]))
+  (reg-fn/subscribe [::href* to]))
 
 (defn navigate*
   "Given the vector `to` made of a named path qualified-keyword and a params
@@ -54,10 +54,8 @@
   (let [go-fx ^{::c/fx ::navigate} (fn [to] (apply rfh/push-state history to))]
     go-fx))
 
-(defmethod ig/init-key ::href-fn [_ {:keys [history]}]
-  ;; Workaround for: https://ask.clojure.org/index.php/8975
-  (let [href-fn ^{::c/reg-fn ::href} (fn [to] (apply rfh/href history to))]
-    href-fn))
+(defmethod ig/init-key ::href* [_ {:keys [history]}]
+  (fn [to] (apply rfh/href history to)))
 
 ;;; Module
 
@@ -69,6 +67,6 @@
     (module/merge-configs
      config {::routes            nil                        ;; provided
              :tape/router        nil                        ;; provided
-             ::href-fn           (ig/ref :tape/router)
+             ::href*             (ig/ref :tape/router)
              ::navigate-fx       (ig/ref :tape/router)
              ::navigate-event-fx #'navigate-event-fx})))
