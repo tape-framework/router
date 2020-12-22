@@ -5,7 +5,6 @@
             [reitit.frontend :as rfr]
             [reitit.frontend.history :as rfh]
             [tape.module :as module]
-            [tape.mvc.controller.reg-fn :as reg-fn]
             [tape.mvc.controller :as c]))
 
 ;;; Interface
@@ -15,7 +14,7 @@
   map, returns a path string of that route with slots filled from params.
   Example: `(router/href* [::counter.c/increment])`."
   [to]
-  (reg-fn/subscribe [::href* to]))
+  @(rf/subscribe [::href to]))
 
 (defn navigate*
   "Given the vector `to` made of a named path qualified-keyword and a params
@@ -54,8 +53,8 @@
   (let [go-fx ^{::c/fx ::navigate} (fn [to] (apply rfh/push-state history to))]
     go-fx))
 
-(defmethod ig/init-key ::href* [_ {:keys [history]}]
-  (fn [to] (apply rfh/href history to)))
+(defmethod ig/init-key ::href [_ {:keys [history]}]
+  (fn [_db [_ to]] (apply rfh/href history to)))
 
 ;;; Module
 
@@ -65,8 +64,7 @@
 (defmethod ig/init-key ::module [_ _]
   (fn [config]
     (module/merge-configs
-     config {::routes            nil                        ;; provided
-             :tape/router        nil                        ;; provided
-             ::href*             (ig/ref :tape/router)
+     config {:tape/router        nil                        ;; provided
+             ::href              (ig/ref :tape/router)
              ::navigate-fx       (ig/ref :tape/router)
              ::navigate-event-fx #'navigate-event-fx})))

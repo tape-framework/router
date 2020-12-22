@@ -10,22 +10,21 @@
 
 (module/load-hierarchy)
 
+(def ^:private routes
+  [["/foo" ::foo]
+   ["/bar/:id" ::bar]
+   ["/baz" ::baz]])
+
 (defn ^::c/event-fx foo [_ _] {})
 (defn ^::c/event-fx bar [_ _] {})
 (defn ^::c/event-fx baz [_ _] {})
 
 (c/defmodule)
 
-(def ^:private routes
-  [["/foo" ::foo]
-   ["/bar/:id" ::bar]
-   ["/baz" ::baz]])
-
 (def ^:private config
-  {:tape.profile/base {::router/routes routes
-                       :tape/router    {:routes  (ig/ref ::router/routes)
-                                        :options {:use-fragment true
-                                                  :conflicts    nil}}}
+  {:tape.profile/base {:tape/router {:routes  routes
+                                     :options {:use-fragment true
+                                               :conflicts    nil}}}
    ::c/module         nil
    ::v/module         nil
    ::router/module    nil
@@ -39,7 +38,7 @@
 
 (deftest module-test
   (is (set/subset? #{:tape/router
-                     ::router/href*
+                     ::router/href
                      ::router/navigate-fx
                      ::router/navigate-event-fx}
                    (set (keys system)))))
