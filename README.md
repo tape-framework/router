@@ -30,7 +30,7 @@ In `config.edn` add `:tape.router/module` and define routes:
 ```edn
 {:tape.profile/base 
  {:tape.router/routes [["/hi/:say" :sample.app.greet.controller/hi]]
-  :tape/router {:routes #ig/reg :tape.router/routes
+  :tape/router {:routes #ig/ref :tape.router/routes
                 :options {:use-fragment true}}}
 
  :tape.router/module nil
