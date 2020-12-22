@@ -1,4 +1,5 @@
 {:tape.router/routes            [:tape/const]
+ :tape.router/options           [:tape/const]
 
  :tape.router/href              [:tape.mvc.controller/sub]
  :tape.router/navigate-fx       [:tape.mvc.controller/fx]

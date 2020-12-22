@@ -10,7 +10,7 @@
 
 (module/load-hierarchy)
 
-(def ^:private routes
+(def ^::c/routes routes
   [["/foo" ::foo]
    ["/bar/:id" ::bar]
    ["/baz" ::baz]])
@@ -22,10 +22,7 @@
 (c/defmodule)
 
 (def ^:private config
-  {:tape.profile/base {:tape/router {:routes  routes
-                                     :options {:use-fragment true
-                                               :conflicts    nil}}}
-   ::c/module         nil
+  {::c/module         nil
    ::v/module         nil
    ::router/module    nil
    ::module           nil})

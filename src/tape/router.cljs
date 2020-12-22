@@ -26,10 +26,21 @@
 
 ;;; Re-Frame
 
+(defmethod ig/init-key ::navigate-fx [_ {:keys [history]}]
+  ;; Workaround for: https://ask.clojure.org/index.php/8975
+  (let [go-fx ^{::c/fx ::navigate} (fn [to] (apply rfh/push-state history to))]
+    go-fx))
+
 (defn- ^{::c/event-fx ::navigate} navigate-event-fx [_ [_ to]]
   {::navigate to})
 
+(defmethod ig/init-key ::href [_ {:keys [history]}]
+  (fn [_db [_ to]] (apply rfh/href history to)))
+
 ;;; Integrant
+
+(defmethod ig/init-key ::routes [_ routes]
+  (into [""] routes))
 
 (defn- on-navigate [match]
   (let [{:keys [data parameters]} match
@@ -48,14 +59,6 @@
 (defmethod ig/halt-key! :tape/router [_ {:keys [history]}]
   (rfh/stop! history))
 
-(defmethod ig/init-key ::navigate-fx [_ {:keys [history]}]
-  ;; Workaround for: https://ask.clojure.org/index.php/8975
-  (let [go-fx ^{::c/fx ::navigate} (fn [to] (apply rfh/push-state history to))]
-    go-fx))
-
-(defmethod ig/init-key ::href [_ {:keys [history]}]
-  (fn [_db [_ to]] (apply rfh/href history to)))
-
 ;;; Module
 
 (defmethod ig/prep-key ::module [_ config]
@@ -64,7 +67,10 @@
 (defmethod ig/init-key ::module [_ _]
   (fn [config]
     (module/merge-configs
-     config {:tape/router        nil                        ;; provided
+     config {::routes            (ig/refset ::c/routes)
+             ::options           {:conflicts nil}           ;; can be provided via profile
+             :tape/router        {:routes  (ig/ref ::routes)
+                                  :options (ig/ref ::options)}
              ::href              (ig/ref :tape/router)
              ::navigate-fx       (ig/ref :tape/router)
              ::navigate-event-fx #'navigate-event-fx})))
