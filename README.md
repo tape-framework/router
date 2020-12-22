@@ -28,13 +28,24 @@ tape/router {:local/root "../router"}
 In `config.edn` add `:tape.router/module` and define routes:
 
 ```edn
-{:tape.profile/base 
- {:tape.router/routes [["/hi/:say" :sample.app.greet.controller/hi]]
-  :tape/router {:routes #ig/ref :tape.router/routes
-                :options {:use-fragment true}}}
+{:tape.profile/base
+ {:my.app/routes [["/hi/:say" :sample.app.greet.controller/hi]]}
 
  :tape.router/module nil
  ...}
+```
+
+Routes are collected from the system map from keys derived from `::c/routes`.
+Note: `(c/defmodule)` collects vars annotated with `^::c/routes` adds them to
+the module map and derives them, so you can add routes in your controllers:
+
+```clojure
+(def ^::c/routes routes
+  ["/people"
+   ["" ::index]
+   ["/show" ::show]])
+;; ...
+(c/defmodule)
 ```
 
 A route resolves to a namespaced keyword that gets dispatched on route match:
