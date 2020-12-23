@@ -1,11 +1,27 @@
 (ns tape.router
   (:refer-clojure :exclude [rest])
   (:require [integrant.core :as ig]
+            [reagent.ratom :as ratom]
             [re-frame.core :as rf]
             [reitit.frontend :as rfr]
             [reitit.frontend.history :as rfh]
             [tape.module :as module]
             [tape.mvc.controller :as c]))
+
+;;; Helpers
+
+;; We disguise Delay as a Reaction to use the subscription mechanism
+;; for function calling. Used in hrefs.
+(extend-type Delay
+  ratom/IDisposable
+  (dispose! [this]
+    (when-some [a (.-on-dispose-arr this)]
+      (dotimes [i (alength a)]
+        ((aget a i) this))))
+  (add-on-dispose! [this f]
+    (if-some [a (.-on-dispose-arr this)]
+      (.push a f)
+      (set! (.-on-dispose-arr this) (array f)))))
 
 ;;; Interface
 
@@ -35,7 +51,7 @@
   {::navigate to})
 
 (defmethod ig/init-key ::href [_ {:keys [history]}]
-  (fn [_db [_ to]] (apply rfh/href history to)))
+  (fn [_db [_ to]] (delay (apply rfh/href history to))))
 
 ;;; Integrant
 
