@@ -44,10 +44,16 @@
 
 (defmethod ig/init-key ::navigate-fx [_ {:keys [history]}]
   ;; Workaround for: https://ask.clojure.org/index.php/8975
-  (let [go-fx ^{::c/fx ::navigate} (fn [to] (apply rfh/push-state history to))]
+  (let [go-fx
+        ^{::c/reg ::c/fx
+          ::c/id ::navigate}
+        (fn [to] (apply rfh/push-state history to))]
     go-fx))
 
-(defn- ^{::c/event-fx ::navigate} navigate-event-fx [_ [_ to]]
+(defn navigate-event-fx
+  {::c/reg ::c/event-fx
+   ::c/id ::navigate}
+  [_ [_ to]]
   {::navigate to})
 
 (defmethod ig/init-key ::href [_ {:keys [history]}]

@@ -10,14 +10,22 @@
 
 (module/load-hierarchy)
 
-(def ^::c/routes routes
+(def ^{::c/reg ::c/routes} routes
   [["/foo" ::foo]
    ["/bar/:id" ::bar]
    ["/baz" ::baz]])
 
-(defn ^::c/event-fx foo [_ _] {})
-(defn ^::c/event-fx bar [_ _] {})
-(defn ^::c/event-fx baz [_ _] {})
+(defn foo
+  {::c/reg ::c/event-fx}
+  [_ _] {})
+
+(defn bar
+  {::c/reg ::c/event-fx}
+  [_ _] {})
+
+(defn baz
+  {::c/reg ::c/event-fx}
+  [_ _] {})
 
 (c/defmodule)
 
