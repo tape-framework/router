@@ -6,7 +6,7 @@
             [reitit.frontend :as rfr]
             [reitit.frontend.history :as rfh]
             [tape.module :as module]
-            [tape.mvc.controller :as c]))
+            [tape.mvc :as mvc :include-macros true]))
 
 ;;; Helpers
 
@@ -44,15 +44,15 @@
 
 (defmethod ig/init-key ::navigate-fx [_ {:keys [history]}]
   ;; Workaround for: https://ask.clojure.org/index.php/8975
-  (let [go-fx
-        ^{::c/reg ::c/fx
-          ::c/id ::navigate}
+  (let [navigate-fx
+        ^{::mvc/reg ::mvc/fx
+          ::mvc/id ::navigate}
         (fn [to] (apply rfh/push-state history to))]
-    go-fx))
+    navigate-fx))
 
 (defn navigate-event-fx
-  {::c/reg ::c/event-fx
-   ::c/id ::navigate}
+  {::mvc/reg ::mvc/event-fx
+   ::mvc/id ::navigate}
   [_ [_ to]]
   {::navigate to})
 
@@ -84,12 +84,12 @@
 ;;; Module
 
 (defmethod ig/prep-key ::module [_ config]
-  (assoc config ::requires {:controller (ig/ref ::c/module)}))
+  (assoc config ::requires {:controller (ig/ref ::mvc/module)}))
 
 (defmethod ig/init-key ::module [_ _]
   (fn [config]
     (module/merge-configs
-     config {::routes            (ig/refset ::c/routes)
+     config {::routes            (ig/refset ::mvc/routes)
              ::options           {:conflicts nil}           ;; can be provided via profile
              :tape/router        {:routes  (ig/ref ::routes)
                                   :options (ig/ref ::options)}

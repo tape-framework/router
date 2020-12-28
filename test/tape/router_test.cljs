@@ -4,66 +4,44 @@
             [day8.re-frame.test :as rft]
             [integrant.core :as ig]
             [tape.module :as module :include-macros true]
-            [tape.mvc.controller :as c :include-macros true]
-            [tape.mvc.view :as v]
-            [tape.router :as router :include-macros true]))
+            [tape.mvc :as mvc :include-macros true]
+            [tape.router :as router :include-macros true]
+            [tape.router.app.controller :as app.c]))
 
 (module/load-hierarchy)
 
-(def ^{::c/reg ::c/routes} routes
-  [["/foo" ::foo]
-   ["/bar/:id" ::bar]
-   ["/baz" ::baz]])
-
-(defn foo
-  {::c/reg ::c/event-fx}
-  [_ _] {})
-
-(defn bar
-  {::c/reg ::c/event-fx}
-  [_ _] {})
-
-(defn baz
-  {::c/reg ::c/event-fx}
-  [_ _] {})
-
-(c/defmodule)
-
 (def ^:private config
-  {::c/module         nil
-   ::v/module         nil
-   ::router/module    nil
-   ::module           nil})
+  {::mvc/module nil
+   ::router/module nil
+   ::app.c/module nil})
 
-(def ^:private system nil)
+(deftest router-test
+  (let [system (-> config module/prep-config ig/init)]
+    (testing "module"
+      (is (set/subset? #{:tape/router
+                         ::router/href
+                         ::router/navigate-fx
+                         ::router/navigate-event-fx}
+                       (set (keys system)))))
 
-(use-fixtures :once
-  {:before (fn [] (set! system (-> config module/prep-config ig/init)))
-   :after  (fn [] (ig/halt! system))})
+    (testing "href*"
+      (is (= "#/foo" (router/href* [::app.c/foo])))
+      (is (= "#/bar/42" (router/href* [::app.c/bar {:id 42}]))))
 
-(deftest module-test
-  (is (set/subset? #{:tape/router
-                     ::router/href
-                     ::router/navigate-fx
-                     ::router/navigate-event-fx}
-                   (set (keys system)))))
+    (testing "navigate*"
+      (rft/run-test-async
+       (router/navigate* [::app.c/baz])
+       (rft/wait-for [::app.c/baz]
+         (is (= "#/baz" (.. js/window -location -hash))))))
 
-(deftest href*-test
-  (is (= "#/foo" (router/href* [::foo])))
-  (is (= "#/bar/42" (router/href* [::bar {:id 42}]))))
+    (testing "href"
+      (is (= "#/foo" (router/href [app.c/foo])))
+      (is (= "#/bar/42" (router/href [app.c/bar {:id 42}]))))
 
-(deftest navigate*-test
-  (rft/run-test-async
-   (router/navigate* [::baz])
-   (rft/wait-for [::baz]
-     (is (= "#/baz" (.. js/window -location -hash))))))
+    (testing "navigate"
+      (rft/run-test-async
+       (router/navigate [app.c/baz])
+       (rft/wait-for [::baz]
+         (is (= "#/baz" (.. js/window -location -hash))))))
 
-(deftest href-test
-  (is (= "#/foo" (router/href [foo])))
-  (is (= "#/bar/42" (router/href [bar {:id 42}]))))
-
-(deftest navigate-test
-  (rft/run-test-async
-   (router/navigate [baz])
-   (rft/wait-for [::baz]
-     (is (= "#/baz" (.. js/window -location -hash))))))
+    (ig/halt! system)))

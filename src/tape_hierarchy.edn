@@ -1,6 +1,6 @@
-{:tape.router/routes            [:tape/const]
- :tape.router/options           [:tape/const]
-
- :tape.router/href              [:tape.mvc.controller/sub-raw]
- :tape.router/navigate-fx       [:tape.mvc.controller/fx]
- :tape.router/navigate-event-fx [:tape.mvc.controller/event-fx]}
+#:tape.router
+    {:routes [:tape/const]
+     :options [:tape/const]
+     :href [:tape.mvc/sub-raw]
+     :navigate-fx [:tape.mvc/fx]
+     :navigate-event-fx [:tape.mvc/event-fx]}
