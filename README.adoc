@@ -1,59 +1,63 @@
-## README
-
-STATUS: Pre-alpha, in design and prototyping phase.
-
-#### About
+== README
 
 `tape.router`
 
-Integrates the [reitit](https://github.com/metosin/reitit) router via a
+=== About
+
+Integrates the https://github.com/metosin/reitit[reitit] router via a
 `tape.module` module, and provides a few handy ways to navigate.
 The router is optional and can be left out in apps that don't need one.
 
-#### Usage
+=== Usage
 
-You must be familiar with [reitit](https://github.com/metosin/reitit),
+You must be familiar with https://github.com/metosin/reitit[reitit],
 `tape.module` and `tape.mvc` before proceeding.
 
-##### Install
+==== Install
 
 Add `tape.router` to your deps:
 
-```clojure
-tape/router {:local/root "../router"}
-```
+.deps.edn
+[source,clojure]
+----
+{:deps {tape/router {:local/root "../router"}}}
+----
 
-##### Module & routes
+==== Module & routes
 
 In `config.edn` add `:tape.router/module` and define routes:
 
-```edn
+.config.edn
+[source,clojure]
+----
 {:tape.profile/base
- {:my.app/routes [["/hi/:say" :sample.app.greet.controller/hi]]}
+ {:tape.router/routes [["/hi/:say" :sample.app.greet.controller/hi]]}
+ ;; ...
+ :tape.router/module nil}
+----
 
- :tape.router/module nil
- ...}
-```
+Routes are collected from the system map from keys derived from `::mvc/routes`.
+Note: `(mvc/defm ::module)` collects vars annotated with `^::mvc/routes` adds
+them to the module map and derives them, so you can add routes in your
+controllers:
 
-Routes are collected from the system map from keys derived from `::c/routes`.
-Note: `(c/defmodule)` collects vars annotated with `^::c/routes` adds them to
-the module map and derives them, so you can add routes in your controllers:
-
-```clojure
-(def ^::c/routes routes
+.app/some/controller.cljs
+[source,clojure]
+----
+(def ^{::mvc/reg ::mvc/routes} routes
   ["/people"
    ["" ::index]
    ["/show" ::show]])
 ;; ...
-(c/defmodule)
-```
+(c/defm ::module)
+----
 
 A route resolves to a namespaced keyword that gets dispatched on route match:
 `[::greet.c/hi parameters]`. The `parameters` has a `:path` map with params
 matched in the path, and a `:query` map with params matched in the query. The
 keyword is also the name of the route.
 
-##### Navigate
+==== Navigate
 
 ```clojure
 (ns sample.app.my-ns
@@ -65,16 +69,16 @@ To navigate we use the route name and a params map that fills the route params
 slots; we have the following utilities:
 
 - `(router/href* [::greet.c/hi {:say "Hi!"}])` returns the path `::greet.c/hi`
-  with path params filled from the provided map `m`. Is used in hiccup anchor
-  hrefs: `[:a {:href (router/href* ...)}]`.
+with path params filled from the provided map `{:say "Hi!"}`. Is used in hiccup
+anchor hrefs: `[:a {:href (router/href* ...)}]`.
 - `(router/navigate* [::greet.c/hi {:say "Hi!"}])` to navigate to a route, used
-  in DOM event handlers (on-click etc).
+in DOM event handlers (on-click etc).
 - `[::router/navigate [::greet.c/hi {:say "Hi!"}]]` a Re-Frame event to that
-  can be dispatched to navigate to a route.
+can be dispatched to navigate to a route.
 - `{::router/navigate [::greet.c/hi {:say "Hi!"}]}` a Re-Frame effect to that
-  results in the browser navigating to a route.
+results in the browser navigating to a route.
 
-##### Navigate via Ergonomic API
+==== Navigate via Ergonomic API
 
 Ergonomic API uses macros with symbols of controller event handlers. Such
 symbols can be navigated via IDE "jump to definition". The macros are
@@ -83,7 +87,7 @@ macroexpanded in the API above, so there's no performance penalty at runtime.
 - `(router/href [greet.c/hi {:say "Hi!"}])`
 - `(router/navigate [greet.c/hi {:say "Hi!"}])`
 
-#### License
+=== License
 
 Copyright © 2019 clyfe
 
