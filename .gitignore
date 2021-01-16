@@ -1,5 +1,10 @@
-/target
-/.nrepl-port
-/router.iml
-/.cpcache
 /.idea
+/router.iml
+/.nrepl-port
+/.cpcache
+/.calva
+/.clj-kondo
+/.lsp
+/target
+/out
+/cljs-test-runner-out
